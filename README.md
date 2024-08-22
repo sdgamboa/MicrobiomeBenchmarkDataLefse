@@ -6,8 +6,25 @@ python3 -m venv env
 source env/bin/activate
 pip install git+https://github.com/SegataLab/lefse.git
 ```
-When the session is over, deactivate with:
+Generate the gingival.txt file:
+
+```bash
+## R dependencies must be installed
+Rscript --vanilla getData.R
+```
+
+Run lefse. The python environment must be active:
+
+```bash
+./script.sh
+```
+
+When the session is over, deactivate the python environment with:
 
 ```bash
 deactivate
 ```
+
+## .res file names
+
+In the .res files, it = iteration and bp = bootstrap value.
