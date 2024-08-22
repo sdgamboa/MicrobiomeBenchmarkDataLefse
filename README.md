@@ -16,6 +16,7 @@ Rscript --vanilla getData.R
 Run lefse. The python environment must be active:
 
 ```bash
+source env/bin/activate
 ./script.sh
 ```
 
