@@ -43,6 +43,6 @@ pip install git+https://github.com/SegataLab/lefse.git
 Deactivate conda environment when the job is over:
 
 ```bash
-deactivate
+conda deactivate
 ```
 
