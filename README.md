@@ -26,7 +26,7 @@ source env/bin/activate
 When the session is over, deactivate the python environment with:
 
 ```bash
-deactivate
+conda deactivate
 ```
 
 ## .res file names
