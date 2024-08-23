@@ -1,6 +1,7 @@
 ## Script for running lefse
 
-lefse_format_input.py gingivalplaque.txt gingivalplaque.in -c 1 -s 2 -u 3 -o 1000000 
+lefse_format_input.py gingivalplaque.txt gingivalplaque.in -c 1 -s -1 -u 2 -o 1000000 
+#lefse_format_input.py gingivalplaque.txt gingivalplaque.in -c 1 -s 2 -u 3 -o 1000000 
 ## -c which row use for class labels (conditions)
 ## -s Which row use for subclass labels (cofounder)
 ## -u which row use for subject labels (samples)

@@ -51,8 +51,8 @@ sm <- tse_subset |>
     colData() |>
     as.data.frame() |>
     tibble::rownames_to_column('Sample') |>
-    select(body_subsite, gender, Sample) |>
-    # select(body_subsite) |>
+    # select(body_subsite, gender, Sample) |>
+    select(body_subsite, Sample) |>
     t() |>
     as.data.frame() |>
     tibble::rownames_to_column('helper_col') |>
