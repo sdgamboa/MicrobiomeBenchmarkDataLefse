@@ -1,0 +1,17 @@
+---
+title: "Lefses"
+output: html_document
+date: "2024-08-23"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(MicrobiomeBenchmarkData)
+library(MicrobiomeBenchmarkDataAnalyses)
+library(lefser)
+library(microbiomeMarker)
+```
+
