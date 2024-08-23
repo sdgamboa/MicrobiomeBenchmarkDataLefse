@@ -19,7 +19,7 @@ Rscript --vanilla getData.R
 
 ```bash
 ## conda activate lefse 
-./script.sh
+./runLefse.sh
 ```
 
 3. Deactivate session when the job is done:
