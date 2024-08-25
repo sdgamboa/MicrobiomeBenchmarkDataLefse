@@ -29,5 +29,8 @@ conda deactivate
 ```
 
 ## .res file names
-
-In the .res files, it = iteration and bp = bootstrap value.
+a = anova threshold
+w = wilcoxon threshold
+lda = lda threshold
+it = iteration
+bp = bootstrap

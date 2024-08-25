@@ -7,10 +7,16 @@ lefse_format_input.py gingivalplaque.txt gingivalplaque.in -c 1 -s -1 -u 2 -o 10
 ## -u which row use for subject labels (samples)
 
 i=1
-while [ $i -le 10 ]
+ath=0.01
+wth=0.01
+ldath=3
+
+rm -rf *res
+
+while [ "$i" -le 10 ]
 do
-    bp=$(( 30 + ($i * 10 )))
-    echo Running iteration $i with bootstrap $bp...
-    lefse_run.py -a 0.05 -w 0.05 -l 2 -b $bp gingivalplaque.in gingivalplaque\_it"$i"\_bp"$bp".res
+    bp=$(( 30 + ("$i" * 10 )))
+    echo Running iteration "$i" with bootstrap "$bp"...
+    lefse_run.py -a "$ath" -w "$wth" -l "$ldath" -b "$bp" gingivalplaque.in gingivalplaque\_a"$ath"\_w"$wth"\_lda"$ldath"\_it"$i"\_bp"$bp".res
     i=$(( $i + 1 ))
 done
