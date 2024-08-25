@@ -1,0 +1,21 @@
+Package: MicrobiomeBenchmarkDataLefse
+Title: Run lefse and microbiomeMarker with the MicrobiomeBenchmarkData package.
+Version: 0.0.0.9000
+Authors@R: 
+    person("Samuel", "Gamboa", , "samuel.gamboa.tuz@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-6863-7943"))
+Description: Run lesse and microbiomeMarker with the MicrobiomeBenchmarkData package.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+VignetteBuilder: knitr
+Remotes:
+    waldronlab/lefser,
+    waldronlab/MicrobiomeBenchmarkDataAnalyses
+Imports: 
+    dplyr,
+    lefser,
+    MicrobiomeBenchmarkData,
+    microbiomeMarker
+Config/Needs/website: rmarkdown

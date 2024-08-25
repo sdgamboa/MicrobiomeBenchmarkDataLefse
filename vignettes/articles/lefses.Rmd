@@ -1,17 +1,17 @@
 ---
-title: "Lefses"
-output: html_document
-date: "2024-08-23"
+title: "lefses"
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
 ```
 
-```{r}
+```{r setup}
 library(MicrobiomeBenchmarkData)
 library(MicrobiomeBenchmarkDataAnalyses)
 library(lefser)
 library(microbiomeMarker)
 ```
-

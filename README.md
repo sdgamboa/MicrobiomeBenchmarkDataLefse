@@ -1,5 +1,11 @@
+# A package for running lefse and microbiomeMarker on MicrobiomeBenchmarkData
 
-## Install lefse from bioconda
+## Lefse (conda version)
+
+Check the inst/scripts for source code.
+Check the inst/extdata directory for results.
+
+### Install lefse from bioconda
 
 ```bash
 conda create -n lefse
@@ -7,7 +13,7 @@ conda activate lefse
 conda install -c bioconda lefse
 ```
 
-## Workflow
+### Workflow
 
 1. Generate the gingival.txt file:
 
@@ -28,7 +34,7 @@ Rscript --vanilla getData.R
 conda deactivate
 ```
 
-## .res file names
+### .res file names
 a = anova threshold
 w = wilcoxon threshold
 lda = lda threshold
