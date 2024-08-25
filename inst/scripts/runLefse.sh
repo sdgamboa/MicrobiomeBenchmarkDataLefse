@@ -1,3 +1,4 @@
+#!/bin/bash
 ## Script for running lefse
 
 lefse_format_input.py gingivalplaque.txt gingivalplaque.in -c 1 -s -1 -u 2 -o 1000000 
