@@ -17,6 +17,7 @@ jobs:
     container: bioconductor/bioconductor_docker:RELEASE_3_19
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      CRAN: https://packagemanager.posit.co/cran/__linux__/jammy/latest
 
     steps:
       - name: Checkout repository
