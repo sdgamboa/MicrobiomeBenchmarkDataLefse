@@ -16,6 +16,12 @@ Remotes:
 Imports: 
     dplyr,
     lefser,
+    mia,
     MicrobiomeBenchmarkData,
-    microbiomeMarker
+    MicrobiomeBenchmarkDataAnalyses,
+    microbiomeMarker,
+    phyloseq,
+    purrr,
+    sessioninfo,
+    stringr
 Config/Needs/website: rmarkdown

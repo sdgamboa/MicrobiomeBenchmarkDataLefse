@@ -9,9 +9,124 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, message=FALSE}
 library(MicrobiomeBenchmarkData)
 library(MicrobiomeBenchmarkDataAnalyses)
 library(lefser)
 library(microbiomeMarker)
+library(dplyr)
+library(purrr)
+library(stringr)
+library(phyloseq)
+library(mia)
 ```
+
+## Get gingival data
+
+```{r, message=FALSE}
+dat_name <- 'HMP_2012_16S_gingival_V35'
+conditions_col <- 'body_subsite'
+conditions <- c(condB = 'subgingival_plaque', condA = 'supragingival_plaque')
+tse <- getBenchmarkData(dat_name, dryrun = FALSE)[[1]]
+col_data <- tse |>
+    colData() |>
+    as.data.frame() |>
+    tibble::rownames_to_column("sample_name") |>
+    as_tibble()
+subjects <- col_data |>
+    pull(subject_id) |>
+    unique()
+sample_names <- vector("list", length(subjects))
+names(sample_names) <- subjects
+for (i in seq_along(subjects))  {
+    current_subject <- subjects[i]
+    sub_dat <- col_data |>
+        filter(subject_id == current_subject) |>
+        slice_max(order_by = visit_number, with_ties = TRUE, n = 1)
+    if (nrow(sub_dat) < 2) {
+        next
+    }
+    lgl_vct <- all(sort(sub_dat[[conditions_col]]) == conditions)
+    if (isFALSE(lgl_vct)) {
+        next
+    }
+    sample_names[[i]] <- sub_dat
+}
+sample_names <- discard(sample_names, is.null)
+col_data_subset <- bind_rows(sample_names)
+selected_samples <- col_data_subset |>
+    pull(sample_name)
+tse_subset <- tse[, selected_samples]
+tse_subset <- filterTaxa(tse_subset)
+rankNames <- colnames(rowData(tse_subset))
+rankNames <- stringr::str_replace(rankNames, "superkingdom", "kingdom")
+colnames(rowData(tse_subset)) <- rankNames
+```
+
+Convert to phyloseq
+
+```{r}
+## Annotations are lost
+ps <- makePhyloseqFromTreeSE(tse_subset)
+colnames(tax_table(ps)) <- str_to_sentence(colnames(tax_table(ps)))
+```
+
+## Parameters
+
+```{r}
+kwth <- 0.01
+wth <- 0.01
+ldath <- 3
+```
+
+
+## Run Lefse with microbiomeMarker
+
+```{r}
+mmLefse <- run_lefse(
+    ps = ps,
+    group = "body_subsite",
+    taxa_rank = "none", # OTUs?
+    norm = "CPM", # This is relative abundance set to 1e6
+    kw_cutoff = kwth,
+    wilcoxon_cutoff = wth,
+    lda_cutoff = ldath,
+    multigrp_strat = FALSE,
+    bootstrap_n = 30
+)
+## pvalue is from the KW
+mmLefseTbl <- marker_table(mmLefse)
+class(mmLefseTbl) <- NULL
+mmLefseTbl <- as_tibble(mmLefseTbl)
+dim(mmLefseTbl)
+```
+
+## Run Lefse with lefser
+
+```{r}
+lefserInput <- relativeAb(tse_subset)
+lefserOutput <- lefser(
+    relab = lefserInput,
+    kruskal.threshold = kwth,
+    wilcox.threshold = wth,
+    lda.threshold = 3,
+    groupCol = "body_subsite",
+    blockCol = NULL
+)
+lefserTbl <- as_tibble(lefserOutput)
+dim(lefserTbl)
+```
+
+## Features in
+
+```{r}
+intersect(mmLefseTbl$feature, lefserTbl$Names)
+```
+
+## Session information
+
+```{r}
+sessioninfo::session_info()
+```
+
+
