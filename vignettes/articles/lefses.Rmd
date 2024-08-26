@@ -23,7 +23,7 @@ library(mia)
 
 ## Get gingival data
 
-```{r, message=FALSE}
+```{r, message=FALSE, warning=FALSE}
 dat_name <- 'HMP_2012_16S_gingival_V35'
 conditions_col <- 'body_subsite'
 conditions <- c(condB = 'subgingival_plaque', condA = 'supragingival_plaque')
@@ -61,17 +61,20 @@ tse_subset <- filterTaxa(tse_subset)
 rankNames <- colnames(rowData(tse_subset))
 rankNames <- stringr::str_replace(rankNames, "superkingdom", "kingdom")
 colnames(rowData(tse_subset)) <- rankNames
+tse_subset
 ```
 
 Convert to phyloseq
 
 ```{r}
 ## Annotations are lost
-ps <- makePhyloseqFromTreeSE(tse_subset)
+# ps <- makePhyloseqFromTreeSE(tse_subset)
+ps <- convertToPhyloseq(tse_subset)
 colnames(tax_table(ps)) <- str_to_sentence(colnames(tax_table(ps)))
+ps
 ```
 
-## Parameters
+## Lefse parameters
 
 ```{r}
 kwth <- 0.01
@@ -79,15 +82,14 @@ wth <- 0.01
 ldath <- 3
 ```
 
-
 ## Run Lefse with microbiomeMarker
 
-```{r}
+```{r, warning=FALSE}
 mmLefse <- run_lefse(
     ps = ps,
     group = "body_subsite",
-    taxa_rank = "none", # OTUs?
-    norm = "CPM", # This is relative abundance set to 1e6
+    taxa_rank = "none",
+    norm = "CPM", # This is the relative abundance but with a total ofset to 1e6
     kw_cutoff = kwth,
     wilcoxon_cutoff = wth,
     lda_cutoff = ldath,
@@ -103,8 +105,13 @@ dim(mmLefseTbl)
 
 ## Run Lefse with lefser
 
-```{r}
+```{r, message=FALSE}
 lefserInput <- relativeAb(tse_subset)
+colData(lefserInput)$body_subsite <- factor(
+    colData(lefserInput)$body_subsite,
+    levels = c("supragingival_plaque", "subgingival_plaque")
+)
+
 lefserOutput <- lefser(
     relab = lefserInput,
     kruskal.threshold = kwth,
@@ -117,10 +124,28 @@ lefserTbl <- as_tibble(lefserOutput)
 dim(lefserTbl)
 ```
 
-## Features in
+## Features in both
 
 ```{r}
-intersect(mmLefseTbl$feature, lefserTbl$Names)
+intersectOTUs <- intersect(mmLefseTbl$feature, lefserTbl$features)
+```
+
+## In both cases supragingival plaque was used as reference
+
+Positive LDA values = increased in subgingival plaque
+Negative LDA values = increased in supragingival plaque
+
+```{r}
+lefserTbl |> 
+    filter(features %in% intersectOTUs) |> 
+    arrange(features)
+```
+
+```{r}
+mmLefseTbl |> 
+    filter(feature %in% intersectOTUs) |> 
+    arrange(feature)
+
 ```
 
 ## Session information
@@ -128,5 +153,3 @@ intersect(mmLefseTbl$feature, lefserTbl$Names)
 ```{r}
 sessioninfo::session_info()
 ```
-
-
