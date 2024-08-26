@@ -35,8 +35,8 @@ conda deactivate
 ```
 
 ### .res file names
-a = anova threshold
-w = wilcoxon threshold
-lda = lda threshold
-it = iteration
-bp = bootstrap
+a = anova threshold  
+w = wilcoxon threshold  
+lda = lda threshold  
+it = iteration  
+bp = bootstrap  
