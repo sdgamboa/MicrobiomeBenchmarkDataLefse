@@ -25,3 +25,5 @@ Imports:
     sessioninfo,
     stringr
 Config/Needs/website: rmarkdown
+URL: https://github.com/waldronlab/MicrobiomeBenchmarkDataLefse
+BugReports: https://github.com/waldronlab/MicrobiomeBenchmarkDataLefse/issues
