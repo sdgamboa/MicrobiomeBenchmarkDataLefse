@@ -22,8 +22,10 @@ Imports:
     microbiomeMarker,
     phyloseq,
     purrr,
+    readr,
     sessioninfo,
-    stringr
+    stringr,
+    tidyr
 Config/Needs/website: rmarkdown
 URL: https://github.com/waldronlab/MicrobiomeBenchmarkDataLefse
 BugReports: https://github.com/waldronlab/MicrobiomeBenchmarkDataLefse/issues
