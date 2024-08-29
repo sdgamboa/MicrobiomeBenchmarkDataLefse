@@ -1,4 +1,3 @@
-#!/bin/bash
 ## Script for running lefse
 
 lefse_format_input.py gingivalplaque.txt gingivalplaque.in -c 1 -s -1 -u 2 -o 1000000 
@@ -12,7 +11,8 @@ ath=0.01
 wth=0.01
 ldath=3
 
-rm -rf *res
+touch gingivalplaque\_a"$ath"\_w"$wth"\_lda"$ldath".log
+exec 1> >(tee gingivalplaque\_a"$ath"\_w"$wth"\_lda"$ldath".log)
 
 while [ "$i" -le 10 ]
 do
