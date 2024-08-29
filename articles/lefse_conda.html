@@ -95,94 +95,153 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stringr.tidyverse.org" class="external-link">stringr</a></span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">colNames</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>    <span class="st">"feature"</span>, <span class="st">"log"</span>, <span class="st">"class"</span>, <span class="st">"lda"</span>, <span class="st">"p-value"</span> </span>
-<span><span class="op">)</span></span>
-<span><span class="va">dirName</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span></span>
-<span>    <span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"MicrobiomeBenchmarkDataLefse"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">fNames</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span></span>
-<span>    path <span class="op">=</span> <span class="va">dirName</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span>, pattern <span class="op">=</span> <span class="st">".res"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">dats</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">fNames</span>, <span class="op">~</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_tsv</a></span><span class="op">(</span><span class="va">.x</span>, show_col_types <span class="op">=</span> <span class="cn">FALSE</span>, col_names <span class="op">=</span> <span class="va">colNames</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">dats</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_remove.html" class="external-link">str_remove</a></span><span class="op">(</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_extract.html" class="external-link">str_extract</a></span><span class="op">(</span><span class="va">fNames</span>, <span class="st">"_a.+_w.+_lda\\d_it\\d+_bp\\d+"</span><span class="op">)</span>, <span class="st">"^_"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
-<h2 id="results-with-0-05-p-value-thr-and-lda-2-thr">Results with 0.05 p-value thr and lda 2 thr<a class="anchor" aria-label="anchor" href="#results-with-0-05-p-value-thr-and-lda-2-thr"></a>
+<h2 id="import-lefse-conda-results">Import lefse-conda results<a class="anchor" aria-label="anchor" href="#import-lefse-conda-results"></a>
 </h2>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">colNames</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"feature"</span>, <span class="st">"log"</span>, <span class="st">"class"</span>, <span class="st">"lda"</span>, <span class="st">"pval"</span><span class="op">)</span></span>
+<span><span class="va">dirName</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"MicrobiomeBenchmarkDataLefse"</span><span class="op">)</span></span>
+<span><span class="va">fNames</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dirName</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span>, pattern <span class="op">=</span> <span class="st">".res"</span><span class="op">)</span></span>
+<span><span class="va">dats</span> <span class="op">&lt;-</span> <span class="va">fNames</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="op">~</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_tsv</a></span><span class="op">(</span><span class="va">.x</span>, show_col_types <span class="op">=</span> <span class="cn">FALSE</span>, col_names <span class="op">=</span> <span class="va">colNames</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">dats</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">fNames</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_extract.html" class="external-link">str_extract</a></span><span class="op">(</span><span class="st">"_a.+_w.+_lda\\d_it\\d+_bp\\d+"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_remove.html" class="external-link">str_remove</a></span><span class="op">(</span><span class="st">"^_"</span><span class="op">)</span></span></code></pre></div>
+<p>All datasets contain the same number of rows, representing all taxa
+in the dataset:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">dats</span>, <span class="va">drop_na</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">dim</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $a0.01_w0.01_lda3_it1_bp40</span></span>
-<span><span class="co">#&gt; [1] 20  5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $a0.01_w0.01_lda3_it10_bp130</span></span>
-<span><span class="co">#&gt; [1] 19  5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $a0.01_w0.01_lda3_it2_bp50</span></span>
-<span><span class="co">#&gt; [1] 19  5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $a0.01_w0.01_lda3_it3_bp60</span></span>
-<span><span class="co">#&gt; [1] 19  5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $a0.01_w0.01_lda3_it4_bp70</span></span>
-<span><span class="co">#&gt; [1] 19  5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $a0.01_w0.01_lda3_it5_bp80</span></span>
-<span><span class="co">#&gt; [1] 19  5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $a0.01_w0.01_lda3_it6_bp90</span></span>
-<span><span class="co">#&gt; [1] 19  5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $a0.01_w0.01_lda3_it7_bp100</span></span>
-<span><span class="co">#&gt; [1] 19  5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $a0.01_w0.01_lda3_it8_bp110</span></span>
-<span><span class="co">#&gt; [1] 19  5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $a0.01_w0.01_lda3_it9_bp120</span></span>
-<span><span class="co">#&gt; [1] 19  5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $a0.05_w0.05_lda2_it1_bp40</span></span>
-<span><span class="co">#&gt; [1] 324   5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $a0.05_w0.05_lda2_it10_bp130</span></span>
-<span><span class="co">#&gt; [1] 326   5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $a0.05_w0.05_lda2_it2_bp50</span></span>
-<span><span class="co">#&gt; [1] 326   5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $a0.05_w0.05_lda2_it3_bp60</span></span>
-<span><span class="co">#&gt; [1] 328   5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $a0.05_w0.05_lda2_it4_bp70</span></span>
-<span><span class="co">#&gt; [1] 324   5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $a0.05_w0.05_lda2_it5_bp80</span></span>
-<span><span class="co">#&gt; [1] 323   5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $a0.05_w0.05_lda2_it6_bp90</span></span>
-<span><span class="co">#&gt; [1] 324   5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $a0.05_w0.05_lda2_it7_bp100</span></span>
-<span><span class="co">#&gt; [1] 323   5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $a0.05_w0.05_lda2_it8_bp110</span></span>
-<span><span class="co">#&gt; [1] 323   5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $a0.05_w0.05_lda2_it9_bp120</span></span>
-<span><span class="co">#&gt; [1] 322   5</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_int</a></span><span class="op">(</span><span class="va">dats</span>, <span class="va">nrow</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1556</span></span></code></pre></div>
+<p>Divide the results in two lists: 1. lda3 = anova = 0.01, wilcox =
+0.01, lda = 3. 2. lda2 = anova = 0.05, wilcox = 0.05, lda = 2.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dats</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>`p-value` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/double.html" class="external-link">as.double</a></span><span class="op">(</span><span class="va">`p-value`</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">`p-value`</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pass <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">`p-value`</span> <span class="op">&lt;</span> <span class="fl">0.01</span>, <span class="st">"yes"</span>, <span class="st">"no"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">pass</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; yes </span></span>
-<span><span class="co">#&gt; 256</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">lda3</span> <span class="op">&lt;-</span> <span class="va">dats</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"lda3"</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">dats</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">lda2</span> <span class="op">&lt;-</span> <span class="va">dats</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"lda2"</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">dats</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="number-of-features-passing-all-the-thresholds">Number of features passing all the thresholds<a class="anchor" aria-label="anchor" href="#number-of-features-passing-all-the-thresholds"></a>
+</h2>
+<p>Let’s check the number of significant features passing all the
+thresholds. Compare these numbers with the logs in the inst/extdata
+directory. Link: <a href="https://github.com/waldronlab/MicrobiomeBenchmarkDataLefse/tree/main/inst/extdata" class="external-link uri">https://github.com/waldronlab/MicrobiomeBenchmarkDataLefse/tree/main/inst/extdata</a></p>
+<p>For lda3:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">lda3</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_int</a></span><span class="op">(</span><span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/drop_na.html" class="external-link">drop_na</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   a0.01_w0.01_lda3_it1_bp40 a0.01_w0.01_lda3_it10_bp130 </span></span>
+<span><span class="co">#&gt;                          20                          19 </span></span>
+<span><span class="co">#&gt;   a0.01_w0.01_lda3_it2_bp50   a0.01_w0.01_lda3_it3_bp60 </span></span>
+<span><span class="co">#&gt;                          19                          19 </span></span>
+<span><span class="co">#&gt;   a0.01_w0.01_lda3_it4_bp70   a0.01_w0.01_lda3_it5_bp80 </span></span>
+<span><span class="co">#&gt;                          19                          19 </span></span>
+<span><span class="co">#&gt;   a0.01_w0.01_lda3_it6_bp90  a0.01_w0.01_lda3_it7_bp100 </span></span>
+<span><span class="co">#&gt;                          19                          19 </span></span>
+<span><span class="co">#&gt;  a0.01_w0.01_lda3_it8_bp110  a0.01_w0.01_lda3_it9_bp120 </span></span>
+<span><span class="co">#&gt;                          19                          19</span></span></code></pre></div>
+<p>For lda2:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">lda2</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_int</a></span><span class="op">(</span><span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/drop_na.html" class="external-link">drop_na</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   a0.05_w0.05_lda2_it1_bp40 a0.05_w0.05_lda2_it10_bp130 </span></span>
+<span><span class="co">#&gt;                         324                         326 </span></span>
+<span><span class="co">#&gt;   a0.05_w0.05_lda2_it2_bp50   a0.05_w0.05_lda2_it3_bp60 </span></span>
+<span><span class="co">#&gt;                         326                         328 </span></span>
+<span><span class="co">#&gt;   a0.05_w0.05_lda2_it4_bp70   a0.05_w0.05_lda2_it5_bp80 </span></span>
+<span><span class="co">#&gt;                         324                         323 </span></span>
+<span><span class="co">#&gt;   a0.05_w0.05_lda2_it6_bp90  a0.05_w0.05_lda2_it7_bp100 </span></span>
+<span><span class="co">#&gt;                         324                         323 </span></span>
+<span><span class="co">#&gt;  a0.05_w0.05_lda2_it8_bp110  a0.05_w0.05_lda2_it9_bp120 </span></span>
+<span><span class="co">#&gt;                         323                         322</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="number-of-features-in-lda3-passing-the-pvalue-threshold">Number of features in lda3 passing the pvalue threshold<a class="anchor" aria-label="anchor" href="#number-of-features-in-lda3-passing-the-pvalue-threshold"></a>
+</h2>
+<p>Number of features with P-value data:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">lda3</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_int</a></span><span class="op">(</span><span class="op">~</span> <span class="op">{</span></span>
+<span>    <span class="va">.x</span> <span class="op">|&gt;</span> </span>
+<span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">pval</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"-"</span>, <span class="va">pval</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   a0.01_w0.01_lda3_it1_bp40 a0.01_w0.01_lda3_it10_bp130 </span></span>
+<span><span class="co">#&gt;                         195                         195 </span></span>
+<span><span class="co">#&gt;   a0.01_w0.01_lda3_it2_bp50   a0.01_w0.01_lda3_it3_bp60 </span></span>
+<span><span class="co">#&gt;                         195                         195 </span></span>
+<span><span class="co">#&gt;   a0.01_w0.01_lda3_it4_bp70   a0.01_w0.01_lda3_it5_bp80 </span></span>
+<span><span class="co">#&gt;                         195                         195 </span></span>
+<span><span class="co">#&gt;   a0.01_w0.01_lda3_it6_bp90  a0.01_w0.01_lda3_it7_bp100 </span></span>
+<span><span class="co">#&gt;                         195                         195 </span></span>
+<span><span class="co">#&gt;  a0.01_w0.01_lda3_it8_bp110  a0.01_w0.01_lda3_it9_bp120 </span></span>
+<span><span class="co">#&gt;                         195                         195</span></span></code></pre></div>
+<p>P-value &lt; 0.01</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">lda3</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="op">~</span> <span class="op">{</span></span>
+<span>    <span class="va">.x</span> <span class="op">|&gt;</span> </span>
+<span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">pval</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"-"</span>, <span class="va">pval</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/double.html" class="external-link">as.double</a></span><span class="op">(</span><span class="va">pval</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pass <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">pval</span> <span class="op">&lt;</span> <span class="fl">0.01</span>, <span class="st">"yes"</span>, <span class="st">"no"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">pass</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span>.id <span class="op">=</span> <span class="st">"res"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 3</span></span></span>
+<span><span class="co">#&gt;    res                         pass      n</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> a0.01_w0.01_lda3_it1_bp40   yes     195</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> a0.01_w0.01_lda3_it10_bp130 yes     195</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> a0.01_w0.01_lda3_it2_bp50   yes     195</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> a0.01_w0.01_lda3_it3_bp60   yes     195</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> a0.01_w0.01_lda3_it4_bp70   yes     195</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> a0.01_w0.01_lda3_it5_bp80   yes     195</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> a0.01_w0.01_lda3_it6_bp90   yes     195</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> a0.01_w0.01_lda3_it7_bp100  yes     195</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> a0.01_w0.01_lda3_it8_bp110  yes     195</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> a0.01_w0.01_lda3_it9_bp120  yes     195</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="number-of-features-in-lda2-passing-the-pvalue-threshold">Number of features in lda2 passing the pvalue threshold<a class="anchor" aria-label="anchor" href="#number-of-features-in-lda2-passing-the-pvalue-threshold"></a>
+</h2>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">lda2</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_int</a></span><span class="op">(</span><span class="op">~</span> <span class="op">{</span></span>
+<span>    <span class="va">.x</span> <span class="op">|&gt;</span> </span>
+<span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">pval</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"-"</span>, <span class="va">pval</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   a0.05_w0.05_lda2_it1_bp40 a0.05_w0.05_lda2_it10_bp130 </span></span>
+<span><span class="co">#&gt;                         408                         408 </span></span>
+<span><span class="co">#&gt;   a0.05_w0.05_lda2_it2_bp50   a0.05_w0.05_lda2_it3_bp60 </span></span>
+<span><span class="co">#&gt;                         408                         408 </span></span>
+<span><span class="co">#&gt;   a0.05_w0.05_lda2_it4_bp70   a0.05_w0.05_lda2_it5_bp80 </span></span>
+<span><span class="co">#&gt;                         408                         408 </span></span>
+<span><span class="co">#&gt;   a0.05_w0.05_lda2_it6_bp90  a0.05_w0.05_lda2_it7_bp100 </span></span>
+<span><span class="co">#&gt;                         408                         408 </span></span>
+<span><span class="co">#&gt;  a0.05_w0.05_lda2_it8_bp110  a0.05_w0.05_lda2_it9_bp120 </span></span>
+<span><span class="co">#&gt;                         408                         408</span></span></code></pre></div>
+<p>P-value &lt; 0.01</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">lda2</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="op">~</span> <span class="op">{</span></span>
+<span>    <span class="va">.x</span> <span class="op">|&gt;</span> </span>
+<span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">pval</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"-"</span>, <span class="va">pval</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/double.html" class="external-link">as.double</a></span><span class="op">(</span><span class="va">pval</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pass <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">pval</span> <span class="op">&lt;</span> <span class="fl">0.05</span>, <span class="st">"yes"</span>, <span class="st">"no"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">pass</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span>.id <span class="op">=</span> <span class="st">"res"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 3</span></span></span>
+<span><span class="co">#&gt;    res                         pass      n</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> a0.05_w0.05_lda2_it1_bp40   yes     408</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> a0.05_w0.05_lda2_it10_bp130 yes     408</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> a0.05_w0.05_lda2_it2_bp50   yes     408</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> a0.05_w0.05_lda2_it3_bp60   yes     408</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> a0.05_w0.05_lda2_it4_bp70   yes     408</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> a0.05_w0.05_lda2_it5_bp80   yes     408</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> a0.05_w0.05_lda2_it6_bp90   yes     408</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> a0.05_w0.05_lda2_it7_bp100  yes     408</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> a0.05_w0.05_lda2_it8_bp110  yes     408</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> a0.05_w0.05_lda2_it9_bp120  yes     408</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">sessioninfo</span><span class="fu">::</span><span class="fu"><a href="https://r-lib.github.io/sessioninfo/reference/session_info.html" class="external-link">session_info</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB; font-weight: bold;">─ Session info ───────────────────────────────────────────────────────────────</span></span></span>
 <span><span class="co">#&gt;  <span style="color: #555555; font-style: italic;">setting </span> <span style="color: #555555; font-style: italic;">value</span></span></span>
@@ -245,7 +304,6 @@
 <span><span class="co">#&gt;  utf8                           1.2.4      <span style="color: #555555;">2023-10-22</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.4.0)</span></span></span>
 <span><span class="co">#&gt;  vctrs                          0.6.5      <span style="color: #555555;">2023-12-01</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.4.0)</span></span></span>
 <span><span class="co">#&gt;  vroom                          1.6.5      <span style="color: #555555;">2023-12-05</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.4.0)</span></span></span>
-<span><span class="co">#&gt;  withr                          3.0.1      <span style="color: #555555;">2024-07-31</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.4.0)</span></span></span>
 <span><span class="co">#&gt;  xfun                           0.47       <span style="color: #555555;">2024-08-17</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.4.0)</span></span></span>
 <span><span class="co">#&gt;  yaml                           2.3.10     <span style="color: #555555;">2024-07-26</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.4.0)</span></span></span>
 <span><span class="co">#&gt; </span></span>
