@@ -10,6 +10,7 @@ Check the inst/extdata directory for results.
 ```bash
 conda create -n lefse
 conda activate lefse
+## conda config --set channel_priority flexible # This might be necessary
 conda install -c bioconda lefse
 ```
 
