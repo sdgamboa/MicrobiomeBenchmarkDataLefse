@@ -5,6 +5,7 @@ lefse_format_input.py gingivalplaque.txt gingivalplaque.in -c 1 -s -1 -u 2 -o 10
 ## -c which row use for class labels (conditions)
 ## -s Which row use for subclass labels (cofounder)
 ## -u which row use for subject labels (samples)
+## -o total value for normalization using relative abundance
 
 i=1
 ath=0.01
