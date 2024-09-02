@@ -81,16 +81,24 @@
 <div class="page-header"><h1 id="a-package-for-running-lefse-and-microbiomemarker-on-microbiomebenchmarkdata">A package for running lefse and microbiomeMarker on MicrobiomeBenchmarkData<a class="anchor" aria-label="anchor" href="#a-package-for-running-lefse-and-microbiomemarker-on-microbiomebenchmarkdata"></a>
 </h1></div>
 <div class="section level2">
+<h2 id="install-this-package-in-r">Install this package in R<a class="anchor" aria-label="anchor" href="#install-this-package-in-r"></a>
+</h2>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://bioconductor.github.io/BiocManager/" class="external-link">"BiocManager"</a></span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
+<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"waldronlab/MicrobiomeBenchmarkDataLefse"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="lefse-conda-version">Lefse (conda version)<a class="anchor" aria-label="anchor" href="#lefse-conda-version"></a>
 </h2>
 <p>Check the inst/scripts for source code. Check the inst/extdata directory for results.</p>
 <div class="section level3">
 <h3 id="install-lefse-from-bioconda">Install lefse from bioconda<a class="anchor" aria-label="anchor" href="#install-lefse-from-bioconda"></a>
 </h3>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="ex">conda</span> create <span class="at">-n</span> lefse</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="ex">conda</span> activate lefse</span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="co">## conda config --set channel_priority flexible # This might be necessary</span></span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> bioconda lefse</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="ex">conda</span> create <span class="at">-n</span> lefse</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="ex">conda</span> activate lefse</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co">## conda config --set channel_priority flexible # This might be necessary</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> bioconda lefse</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="workflow">Workflow<a class="anchor" aria-label="anchor" href="#workflow"></a>
@@ -98,17 +106,17 @@
 <ol style="list-style-type: decimal">
 <li>Generate the gingival.txt file:</li>
 </ol>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co">## R dependencies must be installed</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">--vanilla</span> getData.R</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co">## R dependencies must be installed</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">--vanilla</span> getData.R</span></code></pre></div>
 <ol start="2" style="list-style-type: decimal">
 <li>Run the script:</li>
 </ol>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co">## conda activate lefse </span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="ex">./runLefse.sh</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co">## conda activate lefse </span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="ex">./runLefse.sh</span></span></code></pre></div>
 <ol start="3" style="list-style-type: decimal">
 <li>Deactivate session when the job is done:</li>
 </ol>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="ex">conda</span> deactivate</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="ex">conda</span> deactivate</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="res-file-names">.res file names<a class="anchor" aria-label="anchor" href="#res-file-names"></a>
