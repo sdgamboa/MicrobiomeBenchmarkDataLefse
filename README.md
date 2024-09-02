@@ -1,5 +1,14 @@
 # A package for running lefse and microbiomeMarker on MicrobiomeBenchmarkData
 
+## Install this package in R
+
+```r
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("waldronlab/MicrobiomeBenchmarkDataLefse")
+```
+
+
 ## Lefse (conda version)
 
 Check the inst/scripts for source code.
