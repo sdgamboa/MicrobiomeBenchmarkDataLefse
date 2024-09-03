@@ -2,7 +2,9 @@ library(MicrobiomeBenchmarkData)
 library(MicrobiomeBenchmarkDataAnalyses)
 library(dplyr)
 library(purrr)
+library(tidyr)
 library(tidySummarizedExperiment)
+
 dat_name <- 'HMP_2012_16S_gingival_V35'
 conditions_col <- 'body_subsite'
 conditions <- c(condB = 'subgingival_plaque', condA = 'supragingival_plaque')
@@ -42,17 +44,37 @@ counts <- tse_subset |>
     assay() |>
     as.data.frame() %>%
     tibble::rownames_to_column('feature') |>
-    mutate(across(.cols = everything(), .fns = ~as.character(.x))) |>
-    mutate(feature = gsub("\\.", "_", feature)) |>
-    mutate(feature = gsub("_", "", feature))
+    mutate(across(.cols = everything(), .fns = ~as.character(.x)))
+    # mutate(feature = gsub("\\.", "_", feature)) |>
+    # mutate(feature = gsub("_", "", feature))
 colnames(counts) <- paste0("col", seq_along(counts))
 
+taxData <- tse_subset |>
+    rowData() |>
+    as.data.frame() |>
+    tibble::rownames_to_column('feature') |>
+    rename(kingdom = superkingdom) |>
+    select(-taxon_annotation) |>
+    relocate(feature, .after = genus)
+taxRanks <- colnames(taxData)[-length(taxData)]
+for (i in taxRanks) {
+    colPos <- which(i == colnames(taxData))
+    firstLetter <- sub("^(\\w).*$", "\\1", i)
+    taxData[[colPos]] <- paste0(firstLetter, "_", taxData[[colPos]])
+}
+taxData <- taxData |>
+    tidyr::unite(
+        col =  "new_feature", 1:last_col(), sep = "|", remove = FALSE
+    ) |>
+    select(feature, new_feature)
+## all(taxData$feature == counts$col1)
+counts$col1 <- taxData$new_feature
 sm <- tse_subset |>
     colData() |>
     as.data.frame() |>
     tibble::rownames_to_column('Sample') |>
-    # select(body_subsite, gender, Sample) |>
-    select(body_subsite, Sample) |>
+    select(body_subsite, gender, Sample) |>
+    # select(body_subsite, Sample) |>
     t() |>
     as.data.frame() |>
     tibble::rownames_to_column('helper_col') |>
