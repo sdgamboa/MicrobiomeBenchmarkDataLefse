@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   articles/lefse_conda: lefse_conda.html
   articles/lefses: lefses.html
-last_built: 2024-09-02T20:16Z
+last_built: 2024-09-03T23:33Z
 urls:
   reference: https://waldronlab.io/MicrobiomeBenchmarkDataLefse/reference
   article: https://waldronlab.io/MicrobiomeBenchmarkDataLefse/articles
