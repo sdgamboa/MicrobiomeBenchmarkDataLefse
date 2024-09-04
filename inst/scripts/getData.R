@@ -44,8 +44,8 @@ counts <- tse_subset |>
     assay() |>
     as.data.frame() %>%
     tibble::rownames_to_column('feature') |>
-    mutate(across(.cols = everything(), .fns = ~as.character(.x)))
-    # mutate(feature = gsub("\\.", "_", feature)) |>
+    mutate(across(.cols = everything(), .fns = ~as.character(.x))) |>
+    mutate(feature = gsub("\\.", "_", feature))
     # mutate(feature = gsub("_", "", feature))
 colnames(counts) <- paste0("col", seq_along(counts))
 
@@ -55,7 +55,9 @@ taxData <- tse_subset |>
     tibble::rownames_to_column('feature') |>
     rename(kingdom = superkingdom) |>
     select(-taxon_annotation) |>
-    relocate(feature, .after = genus)
+    relocate(feature, .after = genus) |>
+    mutate(feature = gsub("\\.", "_", feature))
+
 taxRanks <- colnames(taxData)[-length(taxData)]
 for (i in taxRanks) {
     colPos <- which(i == colnames(taxData))
@@ -67,7 +69,6 @@ taxData <- taxData |>
         col =  "new_feature", 1:last_col(), sep = "|", remove = FALSE
     ) |>
     select(feature, new_feature)
-## all(taxData$feature == counts$col1)
 counts$col1 <- taxData$new_feature
 sm <- tse_subset |>
     colData() |>
