@@ -118,6 +118,22 @@ lda2 |> map(~ {
     bind_rows(.id = "res")
 ```
 
+
+# Plot examples
+
+## Cladogram
+
+![](plotCladogram.svg)
+
+
+## Histogram (clade)
+
+![](plotFeat_Fusobacteria.png)
+
+## Histogram (OTU)
+
+![](plotFeat_OTU_97_42482.png)
+
 ```{r}
 sessioninfo::session_info()
 ```
