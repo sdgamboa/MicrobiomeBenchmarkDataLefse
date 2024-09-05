@@ -68,8 +68,8 @@ Convert to phyloseq
 
 ```{r}
 ## Annotations are lost
-# ps <- makePhyloseqFromTreeSE(tse_subset)
-ps <- convertToPhyloseq(tse_subset)
+ps <- makePhyloseqFromTreeSE(tse_subset)
+# ps <- convertToPhyloseq(tse_subset)
 colnames(tax_table(ps)) <- str_to_sentence(colnames(tax_table(ps)))
 ps
 ```
