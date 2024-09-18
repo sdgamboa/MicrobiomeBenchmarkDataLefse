@@ -10,7 +10,7 @@ printHello()
 A character string.
 }
 \description{
-\code{printHello} just prints the string "Hello".
+\code{printHello} just prints "Hello world".
 }
 \examples{
 printHello()

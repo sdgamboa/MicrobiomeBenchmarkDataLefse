@@ -1,6 +1,6 @@
 #' Print Hello
 #'
-#' \code{printHello} just prints the string "Hello".
+#' \code{printHello} just prints "Hello world".
 #'
 #' @return A character string.
 #' @export

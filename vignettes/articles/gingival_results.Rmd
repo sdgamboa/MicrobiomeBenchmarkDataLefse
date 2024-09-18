@@ -13,42 +13,78 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup, message=FALSE}
-# library(MicrobiomeBenchmarkDataLefse)
 library(readr)
 library(dplyr)
 library(tidyr)
+library(ggplot2)
+library(purrr)
 library(microbiomeMarker)
+library(benchdamic)
+library(MicrobiomeBenchmarkData)
+library(ggpubr)
 ```
 
 ## Import data
 
+Create a temporary directory to store the files:
 ```{r}
 fName <- system.file(
-    "extdata", "gingival_results.zip",
+    "extdata", "gingival_results_2024-09-18.zip",
     package = "MicrobiomeBenchmarkDataLefse", mustWork = TRUE
 )
 tmpDir <- tempfile()
 unzip(zipfile = fName, exdir = tmpDir)
 fls <- list.files(tmpDir, full.names = TRUE)
 names(fls) <- list.files(tmpDir, full.names = FALSE)
+```
 
+Read the data and make it uniform:
+
+```{r}
 ## Results from lefse-conda
 lefseDat <- read_tsv(
     grep("\\.res", fls, value = TRUE),
-    col_names = c("feature", "x", "sample", "lda", "pval"),
+    col_names = c("feature", "x", "sample", "lda", "rawP"),
     show_col_types = FALSE
 ) |> 
     select(-x) |> 
     drop_na() |> 
     mutate(
         feature = sub("(OTU)(97)(\\d+)$", "\\1_\\2.\\3", feature)
-    )
-
+    ) |> 
+    mutate(rawP = as.double(rawP)) |> 
+    mutate(adjP = p.adjust(rawP)) |> 
+    dplyr::rename(enGrp = sample) |> 
+    mutate(software = "lefseConda") |> 
+    tibble::column_to_rownames(var = "feature") |> 
+    mutate(
+        lda = case_when(
+            enGrp == "subgingival_plaque" ~ lda,
+            enGrp == "supragingival_plaque" ~ -lda,
+        )
+    ) |> 
+    arrange(lda)
+    
 ## Results from lefser
 lefserDat <- read_csv(
     grep("lefser\\.csv", fls, value = TRUE),
     show_col_types = FALSE
-)
+) |> 
+    tibble::column_to_rownames(var = "features") |> 
+    dplyr::rename(lda = scores) |> 
+    mutate(
+        ## I got the enriched groups by comparing this result with
+        ## lefseDat and mmDat
+        enGrp = case_when(
+            lda < 0 ~ "supragingival_plaque",
+            lda > 0 ~ "subgingival_plaque",
+        ),
+        # lda = abs(lda),
+        rawP = 0.0099,
+        adjP = 0.099
+    ) |> 
+    mutate(software = "lefser") |> 
+    arrange(lda)
 
 ## Results from microbiomeMarker
 mmDat <- readRDS(
@@ -57,5 +93,239 @@ mmDat <- readRDS(
     marker_table() |> 
     as.matrix() |> 
     as.data.frame() |> 
-    as_tibble()
+    magrittr::set_rownames(NULL) |> 
+    tibble::column_to_rownames("feature") |> 
+    dplyr::rename(
+        enGrp = enrich_group,
+        lda = ef_lda,
+        rawP = pvalue,
+        adjP = padj
+    ) |> 
+    mutate_at(
+        .vars = c("lda", "rawP", "adjP"),
+        .funs = as.double
+    ) |> 
+    mutate(software = "microbiomeMarker") |> 
+    mutate(
+        lda = case_when(
+            enGrp == "subgingival_plaque" ~ lda,
+            enGrp == "supragingival_plaque" ~ -lda,
+        )
+    ) |> 
+    arrange(lda)
+
+DA <- list(
+    lefseConda = lefseDat,
+    lefser = lefserDat,
+    microbiomeMarker = mmDat
+)
+map_int(DA, nrow)
 ```
+## Features detected in all methods
+
+```{r}
+x <- intersect(
+    intersect(rownames(mmDat), rownames(lefserDat)),
+    rownames(lefseDat)
+)
+length(x)
+```
+
+## Comparison of absolute LDA scores
+
+```{r}
+DA |> 
+    bind_rows() |>
+    ggplot(aes(lda)) +
+    geom_histogram(aes(fill = software), binwidth = 0.1) +
+    scale_fill_viridis_d(option = "D", name = "Software") +
+    labs(
+        x = "LDA score",
+        y = "Frequency"
+    ) +
+    theme_minimal()
+```
+```{r}
+DA |> 
+    bind_rows() |> 
+    mutate(
+        sig = case_when(
+            rawP < 0.05 ~ TRUE,
+            TRUE ~ FALSE
+        )
+    ) |> 
+    pull(sig) |> 
+    table()
+```
+
+## Benchdamic-like plots
+
+Create a list object compatible with the `benchdamic` workflow:
+
+```{r}
+createBenchObj <- function(x) {
+    pValMat <- x[, c("rawP", "adjP"), drop = FALSE]
+    statInfo <- x
+    name = unique(x[["software"]])
+    list(
+        pValMat = pValMat,
+        statInfo = statInfo,
+        name =  name
+    )
+}
+DA_output <- map(DA, createBenchObj)
+str(DA_output, max.level = 2)
+```
+Get biological information
+
+```{r, message=FALSE, warning=FALSE}
+tse <- getBenchmarkData("HMP_2012_16S_gingival_V35", dryrun = FALSE)[[1]]
+bioData <- tse |> 
+    rowData() |> 
+    as.data.frame()
+```
+
+### Plot of difference of putatitive TRUE and FALSE positives
+
+```{r}
+cbfColors <- c("#D55E00", "#009E73", "#0072B2")
+posData <- createPositives(
+    object = DA_output,
+    priorKnowledge = bioData, enrichmentCol = "taxon_annotation",
+    namesCol = NULL,
+    slot = "statInfo", colName = "lda", type = "logfc",
+    direction = "lda",
+    threshold_pvalue = 1, threshold_logfc = 0,
+    top = seq(5, 100, 5),
+    alternative = "g",
+    verbose = FALSE,
+    TP = list(
+        c("UP Abundant", "anaerobic"),
+        c("DOWN Abundant", "aerobic")
+    ),
+    FP = list(
+        c("UP Abundant", "aerobic"),
+        c("DOWN Abundant", "anaerobic")
+    )
+)
+posPlot <- plotPositives(posData)
+for (i in seq_along(posPlot$layers)) {
+    ## Remove layers (geom_line and geom_point)
+    ## This is necessary to add new layers with shapes and colors of choice
+    posPlot$layers[[1]] <- NULL
+}
+posPlot <- posPlot + 
+    geom_line(
+        aes(x = top, y = TP - FP, linetype = method)
+    ) +
+    geom_point(
+        aes(x = top, y = TP - FP, shape = method)
+    ) +
+    scale_linetype(name = "Software") +
+    scale_shape_manual(values = c(1, 2, 3), name = "Software") +
+    scale_color_manual(values = cbfColors, name = "Software") +
+    theme_minimal()
+posPlot
+```
+### Enrichemnt plot
+
+```{r}
+enData <- createEnrichment(
+    object = DA_output,
+    priorKnowledge = bioData, enrichmentCol = "taxon_annotation",
+    namesCol = NULL,
+    slot = "statInfo", colName = "lda", type = "logfc",
+    direction = "lda",
+    ## No threshold since all results included here
+    ## are significant
+    threshold_pvalue = 1, threshold_logfc = 0,
+    top = NULL,
+    alternative = "greater",
+    verbose = FALSE
+)
+enPlot <- plotEnrichment(enData, "taxon_annotation", c("aerobic", "anaerobic"))
+enPlot <- enPlot +
+    labs(x = "Software") +
+    theme_minimal()
+enPlot
+```
+
+
+```{r}
+myFun <- function(x) {
+    x |> 
+        tibble::rownames_to_column(var = "direction")
+}
+enDatMod <- map(enData, ~ {
+    .x$summaries |> 
+        map(myFun) |> 
+        bind_rows() |> 
+        pivot_longer(
+            names_to = "annotation", values_to = "ntaxa",
+            cols = c(aerobic, anaerobic, facultative_anaerobic)
+        ) |> 
+        filter(!is.na(ntaxa))
+}) |> 
+    bind_rows(.id = "software") |> 
+    mutate(
+        direction = case_when(
+            direction == "DOWN Abundant" ~ "Supragingival",
+            direction == "UP Abundant" ~ "Subgingival"
+        )
+    ) |>  
+    mutate(
+        sig = case_when(
+            pvalue < 0.05 & pvalue >= 0.01 ~ "*" ,
+            pvalue < 0.01 & pvalue >= 0.001 ~ "**",
+            pvalue < 0.001 ~ "***",
+            TRUE ~  ""
+        )
+    )
+enPlotMod <- enDatMod |> 
+    ggplot(aes(software, ntaxa)) +
+    geom_col(
+        aes(fill = annotation),
+        position = position_dodge2(width = 0.9)
+    ) +
+    geom_text(
+        aes(label = sig, color = annotation), 
+        position = position_dodge2(width = 0.9)
+    ) +
+    facet_wrap(~direction) +
+    scale_fill_manual(
+        values = cbfColors, name = "Biological data"
+    ) +
+    labs(
+        x = "Software", y = "Number of DA taxa"
+    ) +
+    guides(color="none") +
+    theme_minimal() +
+    theme(
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "bottom"
+    )
+enPlotMod
+```
+
+### Combined plot
+
+```{r, fig.width=12, fig.height=5}
+pts <- ggarrange(
+    enPlotMod, posPlot,
+    nrow = 1, labels = c("a)", "b)"),
+    widths = c(1, 1)
+)
+pts
+```
+
+## Session information
+
+```{r}
+sessioninfo::session_info()
+```
+
+
+
+
+
+
