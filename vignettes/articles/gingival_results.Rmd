@@ -1,0 +1,61 @@
+---
+title: "Gingival results"
+output:
+    html_document:
+        toc: true
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, message=FALSE}
+# library(MicrobiomeBenchmarkDataLefse)
+library(readr)
+library(dplyr)
+library(tidyr)
+library(microbiomeMarker)
+```
+
+## Import data
+
+```{r}
+fName <- system.file(
+    "extdata", "gingival_results.zip",
+    package = "MicrobiomeBenchmarkDataLefse", mustWork = TRUE
+)
+tmpDir <- tempfile()
+unzip(zipfile = fName, exdir = tmpDir)
+fls <- list.files(tmpDir, full.names = TRUE)
+names(fls) <- list.files(tmpDir, full.names = FALSE)
+
+## Results from lefse-conda
+lefseDat <- read_tsv(
+    grep("\\.res", fls, value = TRUE),
+    col_names = c("feature", "x", "sample", "lda", "pval"),
+    show_col_types = FALSE
+) |> 
+    select(-x) |> 
+    drop_na() |> 
+    mutate(
+        feature = sub("(OTU)(97)(\\d+)$", "\\1_\\2.\\3", feature)
+    )
+
+## Results from lefser
+lefserDat <- read_csv(
+    grep("lefser\\.csv", fls, value = TRUE),
+    show_col_types = FALSE
+)
+
+## Results from microbiomeMarker
+mmDat <- readRDS(
+    grep("mm\\.rds", fls, value = TRUE),
+) |>
+    marker_table() |> 
+    as.matrix() |> 
+    as.data.frame() |> 
+    as_tibble()
+```
