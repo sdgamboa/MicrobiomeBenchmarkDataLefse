@@ -41,7 +41,7 @@ names(fls) <- list.files(tmpDir, full.names = FALSE)
 Read the data and make it uniform:
 
 ```{r}
-## Results from lefse-conda
+## Results from LEfSe (run in Docker)
 lefseDat <- read_tsv(
     grep("\\.res", fls, value = TRUE),
     col_names = c("feature", "x", "sample", "lda", "rawP"),
@@ -55,7 +55,7 @@ lefseDat <- read_tsv(
     mutate(rawP = as.double(rawP)) |> 
     mutate(adjP = p.adjust(rawP)) |> 
     dplyr::rename(enGrp = sample) |> 
-    mutate(software = "lefseConda") |> 
+    mutate(software = "LEfSe") |> 
     tibble::column_to_rownames(var = "feature") |> 
     mutate(
         lda = case_when(
@@ -115,7 +115,7 @@ mmDat <- readRDS(
     arrange(lda)
 
 DA <- list(
-    lefseConda = lefseDat,
+    LEfSe = lefseDat,
     lefser = lefserDat,
     microbiomeMarker = mmDat
 )
@@ -293,7 +293,7 @@ enPlotMod <- enDatMod |>
     ) +
     facet_wrap(~direction) +
     scale_fill_manual(
-        values = cbfColors, name = "Biological data"
+        values = cbfColors, name = "Annotations"
     ) +
     labs(
         x = "Software", y = "Number of DA taxa"
