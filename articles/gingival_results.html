@@ -115,7 +115,7 @@
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fls</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">tmpDir</span>, full.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>Read the data and make it uniform:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">## Results from lefse-conda</span></span>
+<code class="sourceCode R"><span><span class="co">## Results from LEfSe (run in Docker)</span></span>
 <span><span class="va">lefseDat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_tsv</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"\\.res"</span>, <span class="va">fls</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>    col_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"feature"</span>, <span class="st">"x"</span>, <span class="st">"sample"</span>, <span class="st">"lda"</span>, <span class="st">"rawP"</span><span class="op">)</span>,</span>
@@ -129,7 +129,7 @@
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>rawP <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/double.html" class="external-link">as.double</a></span><span class="op">(</span><span class="va">rawP</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>adjP <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/p.adjust.html" class="external-link">p.adjust</a></span><span class="op">(</span><span class="va">rawP</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>enGrp <span class="op">=</span> <span class="va">sample</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>software <span class="op">=</span> <span class="st">"lefseConda"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>software <span class="op">=</span> <span class="st">"LEfSe"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span>var <span class="op">=</span> <span class="st">"feature"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
 <span>        lda <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
@@ -189,12 +189,12 @@
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">lda</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">DA</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    lefseConda <span class="op">=</span> <span class="va">lefseDat</span>,</span>
+<span>    LEfSe <span class="op">=</span> <span class="va">lefseDat</span>,</span>
 <span>    lefser <span class="op">=</span> <span class="va">lefserDat</span>,</span>
 <span>    microbiomeMarker <span class="op">=</span> <span class="va">mmDat</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_int</a></span><span class="op">(</span><span class="va">DA</span>, <span class="va">nrow</span><span class="op">)</span></span>
-<span><span class="co">#&gt;       lefseConda           lefser microbiomeMarker </span></span>
+<span><span class="co">#&gt;            LEfSe           lefser microbiomeMarker </span></span>
 <span><span class="co">#&gt;              327              281              410</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -257,10 +257,10 @@ workflow:</p>
 <span><span class="va">DA_output</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">DA</span>, <span class="va">createBenchObj</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">DA_output</span>, max.level <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 3</span></span>
-<span><span class="co">#&gt;  $ lefseConda      :List of 3</span></span>
+<span><span class="co">#&gt;  $ LEfSe           :List of 3</span></span>
 <span><span class="co">#&gt;   ..$ pValMat :'data.frame': 327 obs. of  2 variables:</span></span>
 <span><span class="co">#&gt;   ..$ statInfo:'data.frame': 327 obs. of  5 variables:</span></span>
-<span><span class="co">#&gt;   ..$ name    : chr "lefseConda"</span></span>
+<span><span class="co">#&gt;   ..$ name    : chr "LEfSe"</span></span>
 <span><span class="co">#&gt;  $ lefser          :List of 3</span></span>
 <span><span class="co">#&gt;   ..$ pValMat :'data.frame': 281 obs. of  2 variables:</span></span>
 <span><span class="co">#&gt;   ..$ statInfo:'data.frame': 281 obs. of  5 variables:</span></span>
@@ -383,7 +383,7 @@ workflow:</p>
 <span>    <span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">direction</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span></span>
-<span>        values <span class="op">=</span> <span class="va">cbfColors</span>, name <span class="op">=</span> <span class="st">"Biological data"</span></span>
+<span>        values <span class="op">=</span> <span class="va">cbfColors</span>, name <span class="op">=</span> <span class="st">"Annotations"</span></span>
 <span>    <span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
 <span>        x <span class="op">=</span> <span class="st">"Software"</span>, y <span class="op">=</span> <span class="st">"Number of DA taxa"</span></span>
@@ -425,7 +425,7 @@ workflow:</p>
 <span><span class="co">#&gt;  collate  en_US.UTF-8</span></span>
 <span><span class="co">#&gt;  ctype    en_US.UTF-8</span></span>
 <span><span class="co">#&gt;  tz       Etc/UTC</span></span>
-<span><span class="co">#&gt;  date     2024-09-18</span></span>
+<span><span class="co">#&gt;  date     2024-09-20</span></span>
 <span><span class="co">#&gt;  pandoc   3.2 @ /usr/bin/ (via rmarkdown)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB; font-weight: bold;">─ Packages ───────────────────────────────────────────────────────────────────</span></span></span>
@@ -701,8 +701,8 @@ workflow:</p>
 <span><span class="co">#&gt;  spatial                    7.3-17     <span style="color: #555555;">2023-07-20</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.4.1)</span></span></span>
 <span><span class="co">#&gt;  spatstat.data              3.1-2      <span style="color: #555555;">2024-06-21</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.4.0)</span></span></span>
 <span><span class="co">#&gt;  spatstat.explore           3.3-2      <span style="color: #555555;">2024-08-21</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.4.0)</span></span></span>
-<span><span class="co">#&gt;  spatstat.geom              3.3-2      <span style="color: #555555;">2024-07-15</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.4.0)</span></span></span>
-<span><span class="co">#&gt;  spatstat.random            3.3-1      <span style="color: #555555;">2024-07-15</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.4.0)</span></span></span>
+<span><span class="co">#&gt;  spatstat.geom              3.3-3      <span style="color: #555555;">2024-09-18</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.4.0)</span></span></span>
+<span><span class="co">#&gt;  spatstat.random            3.3-2      <span style="color: #555555;">2024-09-18</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.4.0)</span></span></span>
 <span><span class="co">#&gt;  spatstat.sparse            3.1-0      <span style="color: #555555;">2024-06-21</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.4.0)</span></span></span>
 <span><span class="co">#&gt;  spatstat.univar            3.0-1      <span style="color: #555555;">2024-09-05</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.4.0)</span></span></span>
 <span><span class="co">#&gt;  spatstat.utils             3.1-0      <span style="color: #555555;">2024-08-17</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.4.0)</span></span></span>
