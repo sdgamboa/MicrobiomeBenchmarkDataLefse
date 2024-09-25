@@ -1,5 +1,7 @@
 ---
 title: "Gingival results"
+author: "Samuel Gamboa-Tuz, Sehyun Oh"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
     html_document:
         toc: true
@@ -208,6 +210,9 @@ posData <- createPositives(
         c("DOWN Abundant", "anaerobic")
     )
 )
+```
+
+```{r}
 posPlot <- plotPositives(posData)
 for (i in seq_along(posPlot$layers)) {
     ## Remove layers (geom_line and geom_point)
@@ -224,7 +229,16 @@ posPlot <- posPlot +
     scale_linetype(name = "Software") +
     scale_shape_manual(values = c(1, 2, 3), name = "Software") +
     scale_color_manual(values = cbfColors, name = "Software") +
-    theme_minimal()
+    theme_minimal() +
+    labs(title = NULL, subtitle = NULL) +
+    ylab("Putative TP - Putative FP") +
+    xlab("# of top features") +
+    theme(
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12)   
+    )
 posPlot
 ```
 ### Enrichemnt plot
@@ -281,6 +295,9 @@ enDatMod <- map(enData, ~ {
             TRUE ~  ""
         )
     )
+```
+
+```{r}
 enPlotMod <- enDatMod |> 
     ggplot(aes(software, ntaxa)) +
     geom_col(
@@ -296,13 +313,17 @@ enPlotMod <- enDatMod |>
         values = cbfColors, name = "Annotations"
     ) +
     labs(
-        x = "Software", y = "Number of DA taxa"
+        x = "", y = "Number of DA taxa"
     ) +
     guides(color="none") +
     theme_minimal() +
     theme(
-        axis.text.x = element_text(angle = 45, hjust = 1),
-        legend.position = "bottom"
+        axis.title = element_text(size = 12),
+        axis.text.x = element_text(angle = 45, hjust = 1, size = 12),
+        legend.position = "bottom",
+        strip.text = element_text(size = 12, face = "bold"),
+        legend.title = element_text(size = 12),
+        legend.text = element_text(size = 10)   
     )
 enPlotMod
 ```
